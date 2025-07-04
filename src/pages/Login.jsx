@@ -1,86 +1,97 @@
-// src/pages/Login.jsx
 import { useState } from "react";
-import { auth } from "../firebaseConfig";
-
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
 } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 
 export function Login() {
-  const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true); // alternar entre login/cadastro
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   const [erro, setErro] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErro("");
-
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, email, senha);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        await createUserWithEmailAndPassword(auth, email, senha);
       }
-
-      navigate("/"); // redireciona para a home
-    } catch (error) {
-      setErro(error.message);
+      navigate("/");
+    } catch (err) {
+      setErro("Erro ao autenticar. Verifique e tente novamente.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-md w-full max-w-md"
-      >
-        <h2 className="text-xl font-bold mb-4 text-center">
-          {isLogin ? "Entrar" : "Criar conta"}
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-4xl w-full flex flex-col md:flex-row gap-8">
+        {/* 📸 Imagem ilustrativa */}
+        <div className="hidden md:flex w-1/2 items-center justify-center">
+          <img
+            src="/images/login-illustration.png"
+            alt="Gráfico ilustrativo"
+            className="max-w-full h-auto"
+          />
+        </div>
 
-        <input
-          type="email"
-          placeholder="E-mail"
-          className="w-full mb-3 px-4 py-2 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        {/* 🧾 Formulário */}
+        <div className="w-full md:w-1/2">
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            {isLogin ? "Bem-vindo de volta!" : "Crie sua conta"}
+          </h2>
 
-        <input
-          type="password"
-          placeholder="Senha"
-          className="w-full mb-4 px-4 py-2 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <p className="text-gray-600 text-center mb-6">
+            Gerencie suas finanças pessoais com facilidade
+          </p>
 
-        {erro && <p className="text-red-600 text-sm mb-4">{erro}</p>}
+          {erro && (
+            <div className="text-red-500 bg-red-100 p-2 rounded mb-4 text-sm">
+              {erro}
+            </div>
+          )}
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          {isLogin ? "Entrar" : "Cadastrar"}
-        </button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Seu e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded"
+            />
+            <input
+              type="password"
+              placeholder="Sua senha"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+              className="w-full border border-gray-300 px-3 py-2 rounded"
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            >
+              {isLogin ? "Entrar" : "Cadastrar"}
+            </button>
+          </form>
 
-        <p className="mt-4 text-center text-sm">
-          {isLogin ? "Não tem conta?" : "Já tem conta?"}{" "}
-          <button
-            type="button"
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:underline"
-          >
-            {isLogin ? "Criar conta" : "Entrar"}
-          </button>
-        </p>
-      </form>
+          <p className="text-sm text-center mt-4">
+            {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}{" "}
+            <button
+              className="text-blue-600 hover:underline"
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? "Cadastre-se" : "Fazer login"}
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
