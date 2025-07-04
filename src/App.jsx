@@ -21,8 +21,13 @@ export default function App() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
 
+  const nomeMes = new Date(selectedMonth + "-01").toLocaleDateString("pt-BR", {
+    month: "long",
+    year: "numeric",
+  });
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUserId(user.uid);
       }
@@ -48,7 +53,7 @@ export default function App() {
 
   useEffect(() => {
     if (userId && selectedMonth) {
-      salvarTransacoes(userId, transactions, selectedMonth);
+      salvarTransacoes(userId, transactions);
     }
   }, [transactions, userId, selectedMonth]);
 
@@ -108,6 +113,19 @@ export default function App() {
     <div className="min-h-screen bg-gray-100">
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Bloco do mês atual e quantidade */}
+        <div className="bg-white p-4 rounded shadow-md text-center space-y-1">
+          <p className="text-sm text-gray-500 font-medium">Mês atual</p>
+          <h2 className="text-xl font-semibold text-gray-800 capitalize">
+            {nomeMes}
+          </h2>
+          <p className="text-sm text-gray-600">
+            Você possui{" "}
+            <span className="font-bold">{filteredTransactions.length}</span>{" "}
+            lançamentos neste mês
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <SummaryCard
             title="Entradas"
@@ -141,7 +159,6 @@ export default function App() {
           onDelete={deleteTransaction}
         />
 
-        {/* Filtros por tipo e mês */}
         <div className="bg-white p-4 rounded shadow-md space-y-4">
           <div className="flex gap-4 items-center">
             <label className="font-medium">Filtrar por tipo:</label>
