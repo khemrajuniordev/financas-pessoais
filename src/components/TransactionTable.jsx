@@ -15,37 +15,53 @@ export function TransactionTable({ transactions, onEdit, onDuplicate, onDelete }
           </tr>
         </thead>
         <tbody>
-          {transactions.map((item, index) => (
-            <tr key={index} className="border-t border-gray-200 hover:bg-gray-50">
-              <td className="px-4 py-2">{item.date}</td>
-              <td className="px-4 py-2">{item.description}</td>
-              <td className="px-4 py-2 text-right font-medium text-gray-800">
-                R$ {Number(item.amount).toFixed(2)}
-              </td>
-              <td className="px-4 py-2 capitalize">{item.type}</td>
-              <td className="px-4 py-2">{item.category}</td>
-              <td className="px-4 py-2 space-x-2 text-sm">
-                <button
-                  onClick={() => onEdit(index)}
-                  className="text-blue-600 hover:underline"
+          {transactions.map((item, index) => {
+            const linhaCor =
+              item.type === "entrada"
+                ? "bg-green-100/50"
+                : item.type === "saida"
+                ? "bg-red-100/50"
+                : "";
+
+            return (
+              <tr
+                key={index}
+                className={`border-t border-gray-200 hover:bg-gray-50 ${linhaCor}`}
+              >
+                <td className="px-4 py-2">{item.date}</td>
+                <td className="px-4 py-2">{item.description}</td>
+                <td
+                  className={`px-4 py-2 text-right font-medium ${
+                    item.type === "entrada" ? "text-green-600" : "text-red-600"
+                  }`}
                 >
-                  Editar
-                </button>
-                <button
-                  onClick={() => onDuplicate(index)}
-                  className="text-yellow-600 hover:underline"
-                >
-                  Duplicar
-                </button>
-                <button
-                  onClick={() => onDelete(index)}
-                  className="text-red-600 hover:underline"
-                >
-                  Excluir
-                </button>
-              </td>
-            </tr>
-          ))}
+                  {item.type === "entrada" ? "+" : "-"} R$ {Number(item.amount).toFixed(2)}
+                </td>
+                <td className="px-4 py-2 capitalize">{item.type}</td>
+                <td className="px-4 py-2">{item.category}</td>
+                <td className="px-4 py-2 space-x-2 text-sm">
+                  <button
+                    onClick={() => onEdit(index)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => onDuplicate(index)}
+                    className="text-yellow-600 hover:underline"
+                  >
+                    Duplicar
+                  </button>
+                  <button
+                    onClick={() => onDelete(index)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
