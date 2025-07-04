@@ -1,4 +1,5 @@
 // TransactionTable.jsx
+import { Pencil, Copy, Trash } from "lucide-react";
 
 export function TransactionTable({ transactions, onEdit, onDuplicate, onDelete }) {
   return (
@@ -39,24 +40,29 @@ export function TransactionTable({ transactions, onEdit, onDuplicate, onDelete }
                 </td>
                 <td className="px-4 py-2 capitalize">{item.type}</td>
                 <td className="px-4 py-2">{item.category}</td>
-                <td className="px-4 py-2 space-x-2 text-sm">
+                <td className="px-4 py-2 flex gap-2">
                   <button
                     onClick={() => onEdit(index)}
-                    className="text-blue-600 hover:underline"
+                    className="p-1 rounded-full hover:bg-gray-200 transition"
+                    title="Editar"
                   >
-                    Editar
+                    <Pencil size={16} className="text-blue-600" />
                   </button>
+
                   <button
                     onClick={() => onDuplicate(index)}
-                    className="text-yellow-600 hover:underline"
+                    className="p-1 rounded-full hover:bg-gray-200 transition"
+                    title="Duplicar"
                   >
-                    Duplicar
+                    <Copy size={16} className="text-yellow-600" />
                   </button>
+
                   <button
                     onClick={() => onDelete(index)}
-                    className="text-red-600 hover:underline"
+                    className="p-1 rounded-full hover:bg-gray-200 transition"
+                    title="Excluir"
                   >
-                    Excluir
+                    <Trash size={16} className="text-red-600" />
                   </button>
                 </td>
               </tr>
