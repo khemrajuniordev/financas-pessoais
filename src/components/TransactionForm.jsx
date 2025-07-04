@@ -1,90 +1,92 @@
-import { useEffect, useState } from "react";
+// src/components/TransactionForm.jsx
+import { useState, useEffect } from "react";
 
 export function TransactionForm({ onAdd, initialData }) {
-  const [formData, setFormData] = useState({
-    date: "",
-    description: "",
-    amount: "",
-    type: "entrada",
-    category: "",
-
-  });
+  const [date, setDate] = useState("");
+  const [type, setType] = useState("entrada");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setDate(initialData.date || "");
+      setType(initialData.type || "entrada");
+      setCategory(initialData.category || "");
+      setDescription(initialData.description || "");
+      setAmount(initialData.amount || "");
     }
   }, [initialData]);
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-
   function handleSubmit(e) {
     e.preventDefault();
-    const transaction = {
-      ...formData,
-      amount: parseFloat(formData.amount),
-    };
-    onAdd(transaction);
-    setFormData({ date: "", description: "", amount: "", type: "entrada" });
+    if (!date || !type || !category || !description || !amount) return;
+
+    onAdd({ date, type, category, description, amount });
+    setDate("");
+    setType("entrada");
+    setCategory("");
+    setDescription("");
+    setAmount("");
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-6 bg-white p-4 shadow rounded">
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md space-y-3">
+      <div className="flex gap-2">
         <input
-          name="date"
           type="date"
-          value={formData.date}
-          onChange={handleChange}
-          className="border rounded p-2"
-          required
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="flex-1 border px-2 py-1 rounded"
         />
         <select
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className="border rounded p-2 w-full"
-          required
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="flex-1 border px-2 py-1 rounded bg-gray-100"
         >
-          <option value="">Selecione a categoria</option>
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="flex-1 border px-2 py-1 rounded bg-gray-100"
+        >
+          <option value="">Selecione uma categoria</option>
           <option value="Salário">Salário</option>
-          <option value="Alimentação">Alimentação</option>
+          <option value="Aluguel">Aluguel</option>
           <option value="Transporte">Transporte</option>
+          <option value="Alimentação">Alimentação</option>
           <option value="Lazer">Lazer</option>
-          <option value="Saúde">Saúde</option>
-          <option value="Educação">Educação</option>
-          <option value="Internet">Internet</option>
+          <option value="Cartão">Cartão</option>
           <option value="Água">Água</option>
           <option value="Energia">Energia</option>
+          <option value="Internet">Internet</option>
           <option value="Outros">Outros</option>
         </select>
-
-        
       </div>
+
       <input
-        name="description"
         type="text"
         placeholder="Descrição"
-        value={formData.description}
-        onChange={handleChange}
-        className="border w-full rounded p-2"
-        required
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full border px-2 py-1 rounded"
       />
+
       <input
-        name="amount"
         type="number"
-        step="0.01"
         placeholder="Valor"
-        value={formData.amount}
-        onChange={handleChange}
-        className="border w-full rounded p-2"
-        required
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        className="w-full border px-2 py-1 rounded"
       />
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-        {initialData ? "Atualizar" : "Adicionar"}
+
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Adicionar
       </button>
     </form>
   );
