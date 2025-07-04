@@ -4,6 +4,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 import { auth } from "../firebaseConfig";
 
+
+
+
 export function PrivateRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
