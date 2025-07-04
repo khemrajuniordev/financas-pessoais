@@ -1,6 +1,6 @@
 // App.jsx
 import { useState, useEffect } from "react";
-import { Header } from "./components/Header";
+import { Header } from "./components/header";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionTable } from "./components/TransactionTable";
 import { SummaryChart } from "./components/SummaryChart";
