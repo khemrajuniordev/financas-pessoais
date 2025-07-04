@@ -1,4 +1,3 @@
-// App.jsx
 import { useState, useEffect } from "react";
 import { Header } from "./components/header";
 import { onAuthStateChanged } from "firebase/auth";
@@ -16,16 +15,13 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [editingIndex, setEditingIndex] = useState(null);
   const [filter, setFilter] = useState("todas");
+
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   });
 
-  const nomeMes = new Date(selectedMonth + "-01").toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-  });
-
+  // 🔐 Autenticação
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -35,6 +31,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // 🔄 Carrega transações do mês ao logar ou trocar mês
   useEffect(() => {
     async function buscar() {
       if (userId && selectedMonth) {
@@ -51,12 +48,14 @@ export default function App() {
     buscar();
   }, [userId, selectedMonth]);
 
+  // 💾 Salva ao mudar algo
   useEffect(() => {
     if (userId && selectedMonth) {
       salvarTransacoes(userId, transactions);
     }
   }, [transactions, userId, selectedMonth]);
 
+  // ⏳ Carregando...
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600 text-xl">
@@ -65,6 +64,7 @@ export default function App() {
     );
   }
 
+  // ➕ Nova transação ou edição
   function addTransaction(newTransaction) {
     const formatted = {
       ...newTransaction,
@@ -81,6 +81,7 @@ export default function App() {
     }
   }
 
+  // ✏️ | 🗑️
   function deleteTransaction(index) {
     setTransactions((prev) => prev.filter((_, i) => i !== index));
   }
@@ -95,6 +96,17 @@ export default function App() {
     setTransactions((prev) => [...prev, duplicated]);
   }
 
+  // 📅 Navegar entre meses
+  function alterarMes(delta) {
+    const [ano, mes] = selectedMonth.split("-").map(Number);
+    const novaData = new Date(ano, mes - 1 + delta);
+    const novoMes = `${novaData.getFullYear()}-${String(
+      novaData.getMonth() + 1
+    ).padStart(2, "0")}`;
+    setSelectedMonth(novoMes);
+  }
+
+  // 🧮 Totais
   const filteredTransactions = transactions.filter((t) => {
     return filter === "todas" || t.type === filter;
   });
@@ -109,23 +121,39 @@ export default function App() {
 
   const saldo = totalEntrada - totalSaida;
 
+  const nomeMes = new Date(selectedMonth + "-01").toLocaleString("pt-BR", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Bloco do mês atual e quantidade */}
-        <div className="bg-white p-4 rounded shadow-md text-center space-y-1">
-          <p className="text-sm text-gray-500 font-medium">Mês atual</p>
-          <h2 className="text-xl font-semibold text-gray-800 capitalize">
-            {nomeMes}
-          </h2>
-          <p className="text-sm text-gray-600">
-            Você possui{" "}
-            <span className="font-bold">{filteredTransactions.length}</span>{" "}
-            lançamentos neste mês
-          </p>
+        {/* ▶️ Mês atual e controles */}
+        <div className="bg-white p-4 rounded shadow text-center space-y-1 flex justify-between items-center">
+          <button
+            onClick={() => alterarMes(-1)}
+            className="text-2xl px-4 hover:text-blue-500"
+          >
+            &lt;
+          </button>
+          <div className="flex-1 text-center">
+            <p className="text-sm text-gray-600">Mês atual</p>
+            <h2 className="text-lg font-bold capitalize">{nomeMes}</h2>
+            <p className="text-sm text-gray-500">
+              Você possui <strong>{transactions.length}</strong> lançamentos neste mês
+            </p>
+          </div>
+          <button
+            onClick={() => alterarMes(1)}
+            className="text-2xl px-4 hover:text-blue-500"
+          >
+            &gt;
+          </button>
         </div>
 
+        {/* 💰 Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <SummaryCard
             title="Entradas"
@@ -147,11 +175,13 @@ export default function App() {
           />
         </div>
 
+        {/* 📝 Formulário */}
         <TransactionForm
           onAdd={addTransaction}
           initialData={editingIndex !== null ? transactions[editingIndex] : null}
         />
 
+        {/* 📋 Tabela */}
         <TransactionTable
           transactions={filteredTransactions}
           onEdit={editTransaction}
@@ -159,6 +189,7 @@ export default function App() {
           onDelete={deleteTransaction}
         />
 
+        {/* 🔍 Filtros */}
         <div className="bg-white p-4 rounded shadow-md space-y-4">
           <div className="flex gap-4 items-center">
             <label className="font-medium">Filtrar por tipo:</label>
@@ -172,18 +203,9 @@ export default function App() {
               <option value="saida">Saídas</option>
             </select>
           </div>
-
-          <div className="flex gap-4 items-center">
-            <label className="font-medium">Filtrar por mês:</label>
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="border rounded px-2 py-1"
-            />
-          </div>
         </div>
 
+        {/* 📊 Gráficos */}
         <SummaryChart transactions={filteredTransactions} />
         <CategoryPieChart transactions={filteredTransactions} />
       </main>
