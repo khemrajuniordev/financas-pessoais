@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
@@ -11,11 +12,13 @@ export function Login() {
   const [senha, setSenha] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [erro, setErro] = useState("");
+  const [mensagem, setMensagem] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErro("");
+    setMensagem("");
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, senha);
@@ -28,9 +31,27 @@ export function Login() {
     }
   };
 
+  const handleEsqueceuSenha = async () => {
+    setErro("");
+    setMensagem("");
+    if (!email) {
+      setErro("Por favor, preencha o e-mail para recuperar a senha.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMensagem("Enviamos um link de recuperação para seu e-mail.");
+    } catch (err) {
+      console.error(err);
+      setErro("Erro ao enviar e-mail de recuperação.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-4xl w-full flex flex-col md:flex-row gap-8">
+        
         {/* 📸 Imagem ilustrativa */}
         <div className="hidden md:flex w-1/2 items-center justify-center">
           <img
@@ -53,6 +74,12 @@ export function Login() {
           {erro && (
             <div className="text-red-500 bg-red-100 p-2 rounded mb-4 text-sm">
               {erro}
+            </div>
+          )}
+
+          {mensagem && (
+            <div className="text-green-500 bg-green-100 p-2 rounded mb-4 text-sm">
+              {mensagem}
             </div>
           )}
 
@@ -81,11 +108,24 @@ export function Login() {
             </button>
           </form>
 
+          {isLogin && (
+            <button
+              onClick={handleEsqueceuSenha}
+              className="w-full text-sm text-blue-600 hover:underline mt-3"
+            >
+              Esqueceu a senha?
+            </button>
+          )}
+
           <p className="text-sm text-center mt-4">
             {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}{" "}
             <button
               className="text-blue-600 hover:underline"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setErro("");
+                setMensagem("");
+              }}
             >
               {isLogin ? "Cadastre-se" : "Fazer login"}
             </button>
